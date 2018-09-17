@@ -27,6 +27,9 @@ function usersBandwidthUp.cfgvalue(self, section)
   return uci:get("ffwizard", "settings", "usersBandwidthUp")
 end
 
+local username = nil
+local password = nil
+
 if uci:get("ffberlin-uplink", "uplink", "auth") == "x509" then
   vpninfo = f:field(DummyValue, "vpninfo", "")
   vpninfo.template = "freifunk/assistent/snippets/vpninfo"
@@ -52,12 +55,12 @@ if uci:get("ffberlin-uplink", "uplink", "auth") == "x509" then
 elseif uci:get("ffberlin-uplink", "uplink", "auth") == "userpass" then
   vpninfo = f:field(DummyValue, "vpninfo", "")
   vpninfo.template = "freifunk/assistent/snippets/vpninfo"
-  local username = f:field(Value, "username", translate("VPN username"))
+  username = f:field(Value, "username", translate("VPN username"))
   username.default="vpn loginname"
   username.rmempty = false
   username.optional = false
 
-  local password = f:field(Value, "password", translate("VPN password"))
+  password = f:field(Value, "password", translate("VPN password"))
   password.default="vpn password"
   password.rmempty = false
   password.optional = false
@@ -77,6 +80,8 @@ function main.write(self, section, value)
   uci:set("ffwizard", "settings", "sharenet", 1)
   uci:set("ffwizard", "settings", "usersBandwidthUp", usersBandwidthUp:formvalue(section))
   uci:set("ffwizard", "settings", "usersBandwidthDown", usersBandwidthDown:formvalue(section))
+  uci:set("ffberlin-uplink", "uplink", "username", username:formvalue(section))
+  uci:set("ffberlin-uplink", "uplink", "password", password:formvalue(section))
 
   uci:section("openvpn", "openvpn", "ffuplink", {
     --persist_tun='0',
@@ -94,6 +99,7 @@ function main.write(self, section, value)
 
   uci:save("openvpn")
   uci:save("ffwizard")
+  uci:save("ffberlin-uplink")
 
   -- I need to commit this here, don't know why I can not do this in apply changes
   uci:commit("openvpn")
