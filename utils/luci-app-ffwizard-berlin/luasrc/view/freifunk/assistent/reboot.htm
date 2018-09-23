@@ -1,5 +1,8 @@
 <%
-  luci.sys.reboot()
+  local uci = require "luci.model.uci".cursor()
+  if uci:get("system", "ffberlin", "devmode") == "0" then
+    luci.sys.reboot()
+  end
 %>
 
 <%+header%>
@@ -24,6 +27,16 @@
       sobald dein Router neugestartet hat.
     </p>
   </div>
+<%
+  local uci = require "luci.model.uci".cursor()
+  if uci:get("system", "ffberlin", "devmode") == "1" then
+%>
+    <p>
+      Das System ist im Entwickler-Modus und der automatische Neustart wird nicht ausgeführt.
+    </p>  
+<%
+  end
+%>
 </div>
 
 <%+footer%>
