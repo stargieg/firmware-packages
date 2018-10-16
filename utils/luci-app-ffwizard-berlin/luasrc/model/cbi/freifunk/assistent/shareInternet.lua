@@ -80,8 +80,10 @@ function main.write(self, section, value)
   uci:set("ffwizard", "settings", "sharenet", 1)
   uci:set("ffwizard", "settings", "usersBandwidthUp", usersBandwidthUp:formvalue(section))
   uci:set("ffwizard", "settings", "usersBandwidthDown", usersBandwidthDown:formvalue(section))
-  uci:set("ffberlin-uplink", "uplink", "username", username:formvalue(section))
-  uci:set("ffberlin-uplink", "uplink", "password", password:formvalue(section))
+  if uci:get("ffberlin-uplink", "uplink", "auth") == "userpass" then
+    uci:set("ffberlin-uplink", "uplink", "username", username:formvalue(section))
+    uci:set("ffberlin-uplink", "uplink", "password", password:formvalue(section))
+  end
 
   uci:section("openvpn", "openvpn", "ffuplink", {
     --persist_tun='0',
