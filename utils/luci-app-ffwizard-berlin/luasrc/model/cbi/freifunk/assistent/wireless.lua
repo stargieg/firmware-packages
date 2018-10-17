@@ -135,8 +135,11 @@ function main.write(self, section, value)
       --WIRELESS CONFIG device
       local hwmode = calchwmode(device)
       local deviceSection = (hwmode:find("a")) and "wifi_device_5" or "wifi_device"
-      local devconfig = uci:get_all("freifunk", deviceSection) or {}
-      util.update(devconfig, uci:get_all(community, deviceSection) or {})
+--      local devconfig = uci:get_all("freifunk", deviceSection) or {}
+--      util.update(devconfig, uci:get_all(community, deviceSection) or {})
+      local devconfig = {}
+      devconfig.country = 'DE'
+      devconfig.disabled = 0
       devconfig.channel = getchannel(device)
       devconfig.hwmode = hwmode
       devconfig.doth = calcdoth(devconfig.channel)
@@ -147,9 +150,10 @@ function main.write(self, section, value)
       --WIRELESS CONFIG ad-hoc
       local pre = calcpre(devconfig.channel)
       local ifaceSection = (pre == 2) and "wifi_iface" or "wifi_iface_5"
-      local ifconfig = uci:get_all("freifunk", ifaceSection) or {}
+--      local ifconfig = uci:get_all("freifunk", ifaceSection) or {}
+--      util.update(ifconfig, uci:get_all(community, ifaceSection) or {})
+      local ifconfig = {}
       local ifnameAdhoc = calcifcfg(device).."-".."mesh".."-"..pre
-      util.update(ifconfig, uci:get_all(community, ifaceSection) or {})
       ifconfig.device = device
       ifconfig.network = calcnif(device)
       ifconfig.ifname = ifnameAdhoc
@@ -243,8 +247,9 @@ function main.write(self, section, value)
     uci:set("dhcp", "frei_funk", "ip", dhcpmeshnet:minhost():string())
 
     --DHCP CONFIG bridge for wifi APs
-    local dhcpbase = uci:get_all("freifunk", "dhcp") or {}
-    util.update(dhcpbase, uci:get_all(community, "dhcp") or {})
+--    local dhcpbase = uci:get_all("freifunk", "dhcp") or {}
+--    util.update(dhcpbase, uci:get_all(community, "dhcp") or {})
+    local dhcpbase = {}
     dhcpbase.interface = "dhcp"
     dhcpbase.force = 1
     dhcpbase.ignore = 0
