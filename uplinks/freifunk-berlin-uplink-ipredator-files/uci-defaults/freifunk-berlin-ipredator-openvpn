@@ -7,9 +7,6 @@ uci commit firewall
 uci set ffberlin-uplink.uplink.auth=userpass
 uci commit ffberlin-uplink.uplink
 
-uci -q get ffberlin-uplink || echo "" | uci import ffberlin-uplink
-uci >/dev/null -q get ffberlin-uplink.preset || uci set ffberlin-uplink.preset=settings
-uci >/dev/null -q get ffberlin-uplink.preset.current || uci set ffberlin-uplink.preset.current="ipredator_openvpn"
 if [[ $(uci get ffberlin-uplink.preset.current) != '"ipredator_openvpn"' ]]; then
   uci rename ffberlin-uplink.preset.current=previous
   uci set ffberlin-uplink.preset.current="ipredator_openvpn"
