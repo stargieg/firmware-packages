@@ -250,6 +250,7 @@ function main.write(self, section, value)
 --    local dhcpbase = uci:get_all("freifunk", "dhcp") or {}
 --    util.update(dhcpbase, uci:get_all(community, "dhcp") or {})
     local dhcpbase = {}
+    dhcpbase.leasetime="5m"
     dhcpbase.interface = "dhcp"
     dhcpbase.force = 1
     dhcpbase.ignore = 0
