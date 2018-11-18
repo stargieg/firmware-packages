@@ -20,7 +20,7 @@ define Package/luci-mod-freifunk-ui
   CATEGORY:=LuCI
   SUBMENU:=2. Modules
   TITLE:=Freifunk Public and Admin LuCI UI
-  DEPENDS:=+luci-mod-admin-full +luci-lib-json +community-profiles +luci-app-opkg
+  DEPENDS:=+luci-mod-admin-full +luci-lib-json +community-profiles +luci-lib-ipkg +luci-app-opkg
   PKGARCH:=all
 endef
 
