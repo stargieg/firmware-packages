@@ -48,6 +48,12 @@ uci:foreach("wireless", "wifi-device",
       return ( x and x:is4()) and x:string() or ""
     end
     wifi_tbl[device]["meship"] = meship
+
+    local meshmode = f:field(ListValue, "mode_" .. device, device:upper() .. " Mesh Mode", "")
+    meshmode:value("mesh", "802.11s")
+    meshmode:value("adhoc", "Ad-Hoc (depricated)")
+    wifi_tbl[device]["meshmode"] = meshmode
+
   end)
 
 -- VAP
@@ -144,25 +150,30 @@ function main.write(self, section, value)
       devconfig.chanlist = calcchanlist(devconfig.channel)
       uci:tset("wireless", device, devconfig)
 
-      --WIRELESS CONFIG ad-hoc
+      --WIRELESS CONFIG mesh
+      local meshmode = wifi_tbl[device]["meshmode"]:formvalue(section)
       local pre = calcpre(devconfig.channel)
-      local ifaceSection = (pre == 2) and "wifi_iface" or "wifi_iface_5"
-      local ifconfig = uci:get_all("freifunk", ifaceSection) or {}
-      local ifnameAdhoc = calcifcfg(device).."-".."adhoc".."-"..pre
+      local ifaceSection
+      if meshmode == "mesh" then
+         ifaceSection = "80211s" 
+      else
+         ifaceSection = ((pre == 2) and "wifi_iface" or "wifi_iface_5")
+      end
+      local ifnameMesh = calcifcfg(device).."-"..meshmode.."-"..pre
+      local ifconfig = uci:get_all("freifunk", ifaceSection) or {}              
       util.update(ifconfig, uci:get_all(community, ifaceSection) or {})
       ifconfig.device = device
       ifconfig.network = calcnif(device)
-      ifconfig.ifname = ifnameAdhoc
-      ifconfig.mode = "adhoc"
-      -- don't set the dns entry
-      ifconfig.dns = nil
-      -- uci:get needs a string as key so we convert to string with tostring()
-      ifconfig.ssid = uci:get(community, "ssidscheme", tostring(devconfig.channel))
-      ifconfig.bssid = uci:get(community, "bssidscheme", tostring(devconfig.channel))
+      ifconfig.ifname = ifnameMesh
+      ifconfig.mode = meshmode
+      if meshmode == "adhoc" then
+        ifconfig.ssid = uci:get(community, "ssidscheme", devconfig.channel)
+        ifconfig.bssid = uci:get(community, "bssidscheme", devconfig.channel)
+      end
       uci:section("wireless", "wifi-iface", nil, ifconfig)
       if statistics_installed then
-        tools.statistics_interface_add("collectd_iwinfo", ifnameAdhoc)
-        tools.statistics_interface_add("collectd_interface", ifnameAdhoc)
+        tools.statistics_interface_add("collectd_iwinfo", ifnameMesh)
+        tools.statistics_interface_add("collectd_interface", ifnameMesh)
       end
 
       --NETWORK CONFIG ad-hoc
