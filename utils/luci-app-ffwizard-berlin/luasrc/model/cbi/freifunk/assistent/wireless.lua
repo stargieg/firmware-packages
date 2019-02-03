@@ -36,8 +36,16 @@ local wifi_tbl = {}
 uci:foreach("wireless", "wifi-device",
   function(section)
     local device = section[".name"]
+    local channel = tonumber(section["channel"])
+    local devicename
+    if ( channel <= 14 ) then
+      devicename = "2.4 Ghz Wifi ("..device:upper()..")"
+    else
+      devicename = "5 Ghz Wifi ("..device:upper()..")"
+    end
+    f:field(DummyValue, device:upper(), devicename)
     wifi_tbl[device] = {}
-    local meship = f:field(Value, "meship_" .. device, device:upper() .. " Mesh-IP", "")
+    local meship = f:field(Value, "meship_" .. device, "Mesh-IP", "")
     meship.rmempty = false
     meship.datatype = "ip4addr"
     function meship.cfgvalue(self, section)
@@ -49,7 +57,7 @@ uci:foreach("wireless", "wifi-device",
     end
     wifi_tbl[device]["meship"] = meship
 
-    local meshmode = f:field(ListValue, "mode_" .. device, device:upper() .. " Mesh Mode", "")
+    local meshmode = f:field(ListValue, "mode_" .. device, "Mesh Mode", "")
     meshmode:value("mesh", "802.11s")
     meshmode:value("adhoc", "Ad-Hoc (depricated)")
     wifi_tbl[device]["meshmode"] = meshmode
